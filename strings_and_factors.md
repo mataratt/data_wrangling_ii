@@ -171,3 +171,64 @@ vec_sex
 
     ## [1] male   male   female female
     ## Levels: male female
+
+## Revisit NSDUH
+
+Import NSDUH data from the web
+
+``` r
+url = "https://samhda.s3-us-gov-west-1.amazonaws.com/s3fs-public/field-uploads/2k15StateFiles/NSDUHsaeShortTermCHG2015.htm"
+
+drug_use_html = read_html(url)
+```
+
+Defining the url and then reading in the url as html.
+
+This is an “easy” case
+
+``` r
+nsduh_df =
+drug_use_html |> 
+  html_table() |> 
+  first() |> 
+  slice(-1)
+```
+
+`first()` gives you the first table (the first thing in the list) you
+can also use `nth()` and insert the table number in () `slice()` can get
+rid of the row
+
+Now we do the tidying…
+
+``` r
+marj_df =
+  nsduh_df |> 
+  select(-contains("P Value")) |> 
+  pivot_longer(
+    -State,
+    names_to = "age_year", 
+    values_to = "percent"
+  ) |> 
+  separate(age_year, into = c("age", "year"), sep = "\\(") |> 
+  mutate(
+    year = str_remove(year, "\\)"),
+    percent = str_remove(percent, "[a-c]$"),
+    percent = as.numeric(percent)
+  ) |> 
+  filter(
+    !State %in% c("Total U.S.", "Northeast", "Midwest", "South", "West")
+  )
+```
+
+Let’s make a quick plot
+
+``` r
+marj_df |> 
+  filter(age == "12-17") |> 
+  mutate(State = fct_reorder(State, percent)) |> 
+  ggplot(aes(x = State, y = percent, color = year)) +
+  geom_point() +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+```
+
+![](strings_and_factors_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
