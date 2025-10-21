@@ -8,6 +8,7 @@ Load key packages.
 ```{r setup, include=FALSE}
 library(rvest)
 library(tidyverse)
+library(p8105.datasets)
 ```
 
 ## Mostly use string vectors
@@ -168,6 +169,117 @@ marj_df |>
   geom_point() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 ```
+
+
+## Restaurant Inspections!
+
+```{r}
+data("rest_inspec")
+```
+
+This is a fun dataset...
+
+```{r}
+rest_inspec |> 
+  group_by(boro, grade) |> 
+  summarize(n = n()) |> 
+  pivot_wider(
+    names_from = grade,
+    values_from = n
+  )
+```
+
+
+Update the dataset.
+```{r}
+rest_inspec =
+  rest_inspec |> 
+  filter(
+    grade %in% c("A", "B", "C"),
+    boro !=0
+    )
+
+```
+
+
+Look for pizza places
+```{r}
+rest_inspec |> 
+  filter(str_detect(dba, "Pizza")) |> 
+  group_by(boro, grade) |> 
+  summarize(n = n()) |> 
+  pivot_wider(
+    names_from = grade,
+    values_from = n
+  )
+```
+
+
+Let's try out best at pattern matching.
+
+```{r}
+rest_inspec |> 
+  filter(str_detect(dba, "[Pp][Ii][Zz][Zz][Aa]")) |> 
+  group_by(boro, grade) |> 
+  summarize(n = n()) |> 
+  pivot_wider(
+    names_from = grade,
+    values_from = n
+  )
+```
+
+
+Let's make this table a plot instead
+
+```{r}
+rest_inspec |> 
+  filter(str_detect(dba, "[Pp][Ii][Zz][Zz][Aa]")) |> 
+  ggplot(aes(x = boro)) +
+  geom_bar()
+```
+
+Update plot
+
+This does not work as intended....
+
+```{r}
+rest_inspec |> 
+  filter(str_detect(dba, "[Pp][Ii][Zz][Zz][Aa]")) |> 
+  mutate(
+    boro = fct_infreq(boro),
+    boro = str_replace(boro, "Manhattan", "The City")) |> 
+  ggplot(aes(x = boro, fill = grade)) +
+  geom_bar()
+```
+
+
+But this does!!
+```{r}
+rest_inspec |> 
+  filter(str_detect(dba, "[Pp][Ii][Zz][Zz][Aa]")) |> 
+  mutate(
+    boro = fct_infreq(boro),
+    boro = fct_recode(boro, "The City" = "Manhattan")) |> 
+  ggplot(aes(x = boro, fill = grade)) +
+  geom_bar()
+```
+`fct_infreq` indicates order of the borough with amount of grades. Order matters.
+`fct_reorder` renaming the variable within that factor
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
