@@ -1,0 +1,122 @@
+---
+title: "Strings and Factors"
+output: github_document
+date: "2025-10-21"
+---
+
+Load key packages.
+```{r setup, include=FALSE}
+library(rvest)
+library(tidyverse)
+```
+
+## Mostly use string vectors
+
+```{r}
+string_vec = c("my", "name", "is", "jeff")
+
+str_detect(string_vec, "jeff")
+str_detect(string_vec, "e")
+str_detect(string_vec, "Jeff")
+
+str_replace(string_vec, "jeff", "Jeff")
+str_replace(string_vec, "e", "E")
+str_replace(string_vec, "e", "")
+```
+`str_detect` goes into find the string that you are looking for. Case sensitivity also matters.
+
+
+
+copied from p8105.com
+
+```{r}
+string_vec = c(
+  "i think we all rule for participating",
+  "i think i have been caught",
+  "i think this will be quite fun actually",
+  "it will be fun, i think"
+  )
+
+str_detect(string_vec, "i think")
+str_detect(string_vec, "^i think")
+str_detect(string_vec, "i think$")
+
+str_remove(string_vec, "i think$")
+```
+Using "^" indicates start of the string
+Using "$" indicates end of the string
+`str_remove` removes part of string u want.
+
+
+Pumpkin themed example!
+```{r}
+string_vec = c(
+  "Time for a Pumpkin Spice Latte!",
+  "went to the #pumpkinpatch last weekend",
+  "Pumpkin Pie is obviously the best pie",
+  "SMASHING PUMPKINS -- LIVE IN CONCERT!!"
+  )
+
+str_detect(string_vec, "Pumpkin")
+str_detect(string_vec, "[Pp]umpkin")
+```
+[ ] indicates anything you want to match inside strings. 
+
+
+
+Let's get a bit more complicated. (Pattern Matching Problem)
+```{r}
+string_vec = c(
+  '7th inning stretch',
+  '1st half soon to begin. Texas won the toss.',
+  'she is 5 feet 4 inches tall',
+  '3AM - cant sleep :('
+  )
+
+str_detect(string_vec, "[0-9][a-zA-Z]")
+```
+
+[0-9]: anything between 0 and 9 counts
+[A-Z]: anything between A and Z counts
+
+
+
+Another example
+```{r}
+string_vec = c(
+  'Its 7:11 in the evening',
+  'want to go to 7-11?',
+  'my flight is AA711',
+  'NetBios: scanning ip 203.167.114.66'
+  )
+
+str_detect(string_vec, "7.1")
+str_detect(string_vec, "7\\.1")
+```
+
+7.1: the "." means anything that matches to it. 
+If you are trying to include a special character like "." in your detection, insert "\\"
+
+
+
+## Factors
+
+```{r}
+vec_sex = factor(c("male", "male", "female", "female"))
+vec_sex
+
+as.numeric(vec_sex)
+
+vec_sex = fct_inorder(vec_sex)
+vec_sex
+```
+
+
+
+
+
+
+
+
+
+
